@@ -1,5 +1,7 @@
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
  
   const { imageData, mediaType } = req.body;
  
@@ -12,7 +14,8 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        // 모델 이름을 현재 사용 가능한 최신 버전으로 수정했습니다.
+        model: 'claude-3-5-sonnet-20241022',
         max_tokens: 1500,
         system: `당신은 31년 경력의 수학 선생님입니다. 중간 실력 학생도 이해할 수 있도록 개념 중심으로 설명합니다.
 반드시 아래 JSON 형식으로만 응답하세요. 마크다운 없이 순수 JSON만 출력하세요:
@@ -28,12 +31,22 @@ export default async function handler(req, res) {
       })
     });
  
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Anthropic API Error: ${JSON.stringify(errorData)}`);
+    }
+
     const data = await response.json();
     const text = data.content.map(i => i.text || '').join('');
     const clean = text.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
+    
     res.status(200).json(parsed);
+    
   } catch (err) {
+    // 이제 에러가 나면 Vercel 로그에 상세 정보가 찍힙니다.
+    console.error("=== 상세 에러 발생 ===", err);
     res.status(500).json({ error: err.message });
   }
 }
+
