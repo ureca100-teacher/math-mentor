@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>수학 멘토 선생님</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 <script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fae6"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,18 +33,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .tag { background: #E6F1FB; color: #0C447C; font-size: 12px; padding: 5px 12px; border-radius: 20px; font-weight: 500; }
 .sol-card { display: none; margin-bottom: 1rem; }
 .sol-card h3 { font-size: 15px; font-weight: 600; color: #111; margin-bottom: 12px; }
-.step { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+.step { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
 .snum { min-width: 24px; height: 24px; border-radius: 50%; background: #185FA5; color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
-.stxt { font-size: 14px; color: #222; line-height: 1.7; }
+.stxt { font-size: 14px; color: #222; line-height: 1.9; }
 .answer-box { margin-top: 12px; padding: 12px; background: #E6F1FB; border-radius: 8px; font-size: 15px; font-weight: 600; color: #0C447C; }
 .graph-wrap { margin-top: 1rem; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; display: none; }
 .graph-wrap h4 { padding: 8px 12px; background: #185FA5; color: #fff; font-size: 13px; font-weight: 500; }
-#calculator { width: 100%; height: 300px; }
+#calculator { width: 100%; height: 320px; }
 .chat-wrap { display: none; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; margin-top: 1rem; }
 .chat-header { padding: 10px 14px; background: #185FA5; color: #fff; font-size: 13px; font-weight: 500; }
-.chat-msgs { padding: 1rem; min-height: 120px; max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f9f9f9; }
-.msg { padding: 10px 14px; border-radius: 10px; font-size: 13px; line-height: 1.6; max-width: 88%; }
-.msg.bot { background: #fff; color: #222; align-self: flex-start; border: 1px solid #e0e0e0; white-space: pre-wrap; }
+.chat-msgs { padding: 1rem; min-height: 120px; max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f9f9f9; }
+.msg { padding: 10px 14px; border-radius: 10px; font-size: 14px; line-height: 1.9; max-width: 90%; }
+.msg.bot { background: #fff; color: #222; align-self: flex-start; border: 1px solid #e0e0e0; }
 .msg.user { background: #185FA5; color: #fff; align-self: flex-end; }
 .chat-input { display: flex; border-top: 1px solid #e0e0e0; }
 .chat-input input { flex: 1; padding: 12px 14px; font-size: 13px; border: none; outline: none; background: #fff; }
@@ -122,27 +125,16 @@ function loadImg(e) {
   r.readAsDataURL(f);
 }
 
-function cleanText(text) {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '$1')
-    .replace(/\*(.*?)\*/g, '$1')
-    .replace(/#{1,6}\s/g, '')
-    .replace(/\$\$(.*?)\$\$/gs, '$1')
-    .replace(/\$(.*?)\$/g, '$1')
-    .replace(/\\times/g, '×')
-    .replace(/\\div/g, '÷')
-    .replace(/\\pm/g, '±')
-    .replace(/\\leq/g, '≤')
-    .replace(/\\geq/g, '≥')
-    .replace(/\\neq/g, '≠')
-    .replace(/\\infty/g, '∞')
-    .replace(/\\sqrt\{(.*?)\}/g, '√($1)')
-    .replace(/\\frac\{(.*?)\}\{(.*?)\}/g, '($1)/($2)')
-    .replace(/\^{(.*?)}/g, '^$1')
-    .replace(/_{(.*?)}/g, '_$1')
-    .replace(/\\[a-zA-Z]+/g, '')
-    .replace(/[{}]/g, '')
-    .trim();
+function renderMath(el) {
+  if (window.renderMathInElement) {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
 }
 
 function drawGraph(expressions) {
@@ -153,7 +145,7 @@ function drawGraph(expressions) {
   const elt = document.getElementById('calculator');
   calculator = Desmos.GraphingCalculator(elt, { expressionsCollapsed: true });
   expressions.forEach((expr, i) => {
-    calculator.setExpression({ id: 'graph' + i, latex: expr });
+    calculator.setExpression({ id: 'g' + i, latex: expr });
   });
 }
 
@@ -175,16 +167,20 @@ async function analyze() {
     history = [];
 
     document.getElementById('loading').style.display = 'none';
-    document.getElementById('tags').innerHTML = parsed.concepts.map(c => `<span class="tag">${cleanText(c)}</span>`).join('');
+    document.getElementById('tags').innerHTML = parsed.concepts.map(c => `<span class="tag">${c}</span>`).join('');
     document.getElementById('conceptBox').style.display = 'block';
 
     let html = parsed.steps.map(s => `
       <div class="step">
         <div class="snum">${s.num}</div>
-        <div class="stxt">${cleanText(s.text)}</div>
+        <div class="stxt">${s.text}</div>
       </div>`).join('');
-    html += `<div class="answer-box">정답: ${cleanText(parsed.answer)}</div>`;
-    document.getElementById('solContent').innerHTML = html;
+    html += `<div class="answer-box">정답: ${parsed.answer}</div>`;
+
+    const solContent = document.getElementById('solContent');
+    solContent.innerHTML = html;
+    renderMath(solContent);
+
     document.getElementById('solBox').style.display = 'block';
     document.getElementById('chatWrap').style.display = 'block';
 
@@ -225,10 +221,13 @@ async function sendMsg() {
     });
     if (!res.ok) throw new Error('서버 오류');
     const data = await res.json();
-    const reply = cleanText(data.reply);
     history.push({ role: 'assistant', content: data.reply });
     document.getElementById('typing')?.remove();
-    box.innerHTML += `<div class="msg bot">${reply}</div>`;
+    const msgEl = document.createElement('div');
+    msgEl.className = 'msg bot';
+    msgEl.innerHTML = data.reply;
+    box.appendChild(msgEl);
+    renderMath(msgEl);
     box.scrollTop = box.scrollHeight;
   } catch (err) {
     document.getElementById('typing')?.remove();
