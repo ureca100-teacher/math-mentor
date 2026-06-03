@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        // 모델 이름을 현재 사용 가능한 최신 버전으로 수정했습니다.
+        // 모델명을 현재 사용 가능한 최신 것으로 수정했습니다.
         model: 'claude-3-5-sonnet-20241022',
         max_tokens: 1500,
         system: `당신은 31년 경력의 수학 선생님입니다. 중간 실력 학생도 이해할 수 있도록 개념 중심으로 설명합니다.
@@ -31,9 +31,11 @@ export default async function handler(req, res) {
       })
     });
  
+    // API 응답이 성공인지 확인
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(`Anthropic API Error: ${JSON.stringify(errorData)}`);
+      console.error("API 에러 발생:", errorData);
+      return res.status(500).json({ error: 'API 호출 실패', details: errorData });
     }
 
     const data = await response.json();
@@ -44,9 +46,8 @@ export default async function handler(req, res) {
     res.status(200).json(parsed);
     
   } catch (err) {
-    // 이제 에러가 나면 Vercel 로그에 상세 정보가 찍힙니다.
-    console.error("=== 상세 에러 발생 ===", err);
+    // 상세 에러 로그를 남깁니다.
+    console.error("서버 내부 에러:", err);
     res.status(500).json({ error: err.message });
   }
 }
-
