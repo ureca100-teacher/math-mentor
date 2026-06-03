@@ -13,7 +13,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         // 모델명을 현재 사용 가능한 최신 것으로 수정했습니다.
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-3-5-sonnet-20240620',
         max_tokens: 1000,
         system: `당신은 31년 경력의 수학 선생님입니다. 개념 중심으로 친절하고 따뜻하게 설명합니다. 중간 실력 학생도 이해할 수 있도록 쉽게 설명해주세요. 앞서 풀이한 문제 정보: ${context}`,
         messages
