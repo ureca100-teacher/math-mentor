@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>수학 멘토 선생님</title>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fae6"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; min-height: 100vh; padding: 2rem 1rem; }
-.wrap { max-width: 640px; margin: 0 auto; }
+.wrap { max-width: 680px; margin: 0 auto; }
 .hd { text-align: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #e0e0e0; }
 .hd h1 { font-size: 22px; font-weight: 600; color: #111; margin-bottom: 4px; }
 .hd p { font-size: 13px; color: #666; }
@@ -34,11 +34,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .snum { min-width: 24px; height: 24px; border-radius: 50%; background: #185FA5; color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
 .stxt { font-size: 14px; color: #222; line-height: 1.7; }
 .answer-box { margin-top: 12px; padding: 12px; background: #E6F1FB; border-radius: 8px; font-size: 15px; font-weight: 600; color: #0C447C; }
-.chat-wrap { display: none; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; }
+.graph-wrap { margin-top: 1rem; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; display: none; }
+.graph-wrap h4 { padding: 8px 12px; background: #185FA5; color: #fff; font-size: 13px; font-weight: 500; }
+#calculator { width: 100%; height: 300px; }
+.chat-wrap { display: none; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; margin-top: 1rem; }
 .chat-header { padding: 10px 14px; background: #185FA5; color: #fff; font-size: 13px; font-weight: 500; }
 .chat-msgs { padding: 1rem; min-height: 120px; max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f9f9f9; }
-.msg { padding: 10px 14px; border-radius: 10px; font-size: 13px; line-height: 1.6; max-width: 88%; white-space: pre-wrap; }
-.msg.bot { background: #fff; color: #222; align-self: flex-start; border: 1px solid #e0e0e0; }
+.msg { padding: 10px 14px; border-radius: 10px; font-size: 13px; line-height: 1.6; max-width: 88%; }
+.msg.bot { background: #fff; color: #222; align-self: flex-start; border: 1px solid #e0e0e0; white-space: pre-wrap; }
 .msg.user { background: #185FA5; color: #fff; align-self: flex-end; }
 .chat-input { display: flex; border-top: 1px solid #e0e0e0; }
 .chat-input input { flex: 1; padding: 12px 14px; font-size: 13px; border: none; outline: none; background: #fff; }
@@ -75,6 +78,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <div class="sol-card card" id="solBox">
     <h3>단계별 풀이</h3>
     <div id="solContent"></div>
+    <div class="graph-wrap" id="graphWrap">
+      <h4>그래프</h4>
+      <div id="calculator"></div>
+    </div>
   </div>
 
   <div class="chat-wrap" id="chatWrap">
@@ -94,6 +101,7 @@ let imgData = null;
 let imgType = null;
 let history = [];
 let context = '';
+let calculator = null;
 
 function loadImg(e) {
   const f = e.target.files[0];
@@ -109,8 +117,44 @@ function loadImg(e) {
     document.getElementById('conceptBox').style.display = 'none';
     document.getElementById('solBox').style.display = 'none';
     document.getElementById('chatWrap').style.display = 'none';
+    document.getElementById('graphWrap').style.display = 'none';
   };
   r.readAsDataURL(f);
+}
+
+function cleanText(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/#{1,6}\s/g, '')
+    .replace(/\$\$(.*?)\$\$/gs, '$1')
+    .replace(/\$(.*?)\$/g, '$1')
+    .replace(/\\times/g, '×')
+    .replace(/\\div/g, '÷')
+    .replace(/\\pm/g, '±')
+    .replace(/\\leq/g, '≤')
+    .replace(/\\geq/g, '≥')
+    .replace(/\\neq/g, '≠')
+    .replace(/\\infty/g, '∞')
+    .replace(/\\sqrt\{(.*?)\}/g, '√($1)')
+    .replace(/\\frac\{(.*?)\}\{(.*?)\}/g, '($1)/($2)')
+    .replace(/\^{(.*?)}/g, '^$1')
+    .replace(/_{(.*?)}/g, '_$1')
+    .replace(/\\[a-zA-Z]+/g, '')
+    .replace(/[{}]/g, '')
+    .trim();
+}
+
+function drawGraph(expressions) {
+  if (!expressions || expressions.length === 0) return;
+  const graphWrap = document.getElementById('graphWrap');
+  graphWrap.style.display = 'block';
+  if (calculator) calculator.destroy();
+  const elt = document.getElementById('calculator');
+  calculator = Desmos.GraphingCalculator(elt, { expressionsCollapsed: true });
+  expressions.forEach((expr, i) => {
+    calculator.setExpression({ id: 'graph' + i, latex: expr });
+  });
 }
 
 async function analyze() {
@@ -131,18 +175,23 @@ async function analyze() {
     history = [];
 
     document.getElementById('loading').style.display = 'none';
-    document.getElementById('tags').innerHTML = parsed.concepts.map(c => `<span class="tag">${c}</span>`).join('');
+    document.getElementById('tags').innerHTML = parsed.concepts.map(c => `<span class="tag">${cleanText(c)}</span>`).join('');
     document.getElementById('conceptBox').style.display = 'block';
 
     let html = parsed.steps.map(s => `
       <div class="step">
         <div class="snum">${s.num}</div>
-        <div class="stxt">${s.text}</div>
+        <div class="stxt">${cleanText(s.text)}</div>
       </div>`).join('');
-    html += `<div class="answer-box">정답: ${parsed.answer}</div>`;
+    html += `<div class="answer-box">정답: ${cleanText(parsed.answer)}</div>`;
     document.getElementById('solContent').innerHTML = html;
     document.getElementById('solBox').style.display = 'block';
     document.getElementById('chatWrap').style.display = 'block';
+
+    if (parsed.graphs && parsed.graphs.length > 0) {
+      drawGraph(parsed.graphs);
+    }
+
   } catch (err) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('analyzeBtn').style.display = 'block';
@@ -176,9 +225,10 @@ async function sendMsg() {
     });
     if (!res.ok) throw new Error('서버 오류');
     const data = await res.json();
+    const reply = cleanText(data.reply);
     history.push({ role: 'assistant', content: data.reply });
     document.getElementById('typing')?.remove();
-    box.innerHTML += `<div class="msg bot">${data.reply}</div>`;
+    box.innerHTML += `<div class="msg bot">${reply}</div>`;
     box.scrollTop = box.scrollHeight;
   } catch (err) {
     document.getElementById('typing')?.remove();
