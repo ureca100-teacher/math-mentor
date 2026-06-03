@@ -5,53 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>수학 멘토 선생님</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; min-height: 100vh; padding: 2rem 1rem; }
-  .wrap { max-width: 640px; margin: 0 auto; }
-  .hd { text-align: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #e0e0e0; }
-  .hd h1 { font-size: 22px; font-weight: 600; color: #111; margin-bottom: 4px; }
-  .hd p { font-size: 13px; color: #666; }
-  .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
-  label { font-size: 12px; color: #666; margin-bottom: 6px; display: block; }
-  .row { display: flex; gap: 8px; }
-  .row input { flex: 1; padding: 9px 12px; font-size: 13px; border-radius: 8px; border: 1px solid #ccc; outline: none; }
-  .row input:focus { border-color: #185FA5; }
-  .btn { padding: 9px 18px; background: #185FA5; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
-  .btn:hover { background: #0C447C; }
-  .btn:disabled { background: #aaa; cursor: not-allowed; }
-  .status { font-size: 12px; margin-top: 6px; color: #666; }
-  .upload { border: 2px dashed #ccc; border-radius: 12px; padding: 2rem; text-align: center; cursor: pointer; background: #fafafa; margin-bottom: 1rem; transition: background 0.2s; }
-  .upload:hover { background: #f0f0f0; }
-  .upload p { font-size: 14px; color: #666; margin-bottom: 4px; }
-  .upload small { font-size: 12px; color: #999; }
-  #previewImg { max-width: 100%; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #e0e0e0; display: none; }
-  .analyze-btn { width: 100%; padding: 12px; background: #185FA5; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 1rem; display: none; }
-  .analyze-btn:hover { background: #0C447C; }
-  .loading { text-align: center; padding: 1.5rem; display: none; }
-  .spinner { width: 24px; height: 24px; border: 3px solid #e0e0e0; border-top-color: #185FA5; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading p { font-size: 13px; color: #666; }
-  .concept-card { display: none; margin-bottom: 1rem; }
-  .section-label { font-size: 12px; font-weight: 600; color: #666; margin-bottom: 8px; letter-spacing: 0.5px; text-transform: uppercase; }
-  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-  .tag { background: #E6F1FB; color: #0C447C; font-size: 12px; padding: 5px 12px; border-radius: 20px; font-weight: 500; }
-  .sol-card { display: none; margin-bottom: 1rem; }
-  .sol-card h3 { font-size: 15px; font-weight: 600; color: #111; margin-bottom: 12px; }
-  .step { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
-  .snum { min-width: 24px; height: 24px; border-radius: 50%; background: #185FA5; color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
-  .stxt { font-size: 14px; color: #222; line-height: 1.7; }
-  .answer-box { margin-top: 12px; padding: 12px; background: #E6F1FB; border-radius: 8px; font-size: 15px; font-weight: 600; color: #0C447C; }
-  .chat-wrap { display: none; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; }
-  .chat-header { padding: 10px 14px; background: #185FA5; color: #fff; font-size: 13px; font-weight: 500; }
-  .chat-msgs { padding: 1rem; min-height: 120px; max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f9f9f9; }
-  .msg { padding: 10px 14px; border-radius: 10px; font-size: 13px; line-height: 1.6; max-width: 88%; }
-  .msg.bot { background: #fff; color: #222; align-self: flex-start; border: 1px solid #e0e0e0; }
-  .msg.user { background: #185FA5; color: #fff; align-self: flex-end; }
-  .chat-input { display: flex; border-top: 1px solid #e0e0e0; }
-  .chat-input input { flex: 1; padding: 12px 14px; font-size: 13px; border: none; outline: none; background: #fff; }
-  .chat-input button { padding: 12px 18px; background: #185FA5; color: #fff; border: none; font-size: 13px; font-weight: 500; cursor: pointer; }
-  .chat-input button:hover { background: #0C447C; }
-  .err-msg { font-size: 12px; color: #c0392b; margin-top: 6px; display: none; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; min-height: 100vh; padding: 2rem 1rem; }
+.wrap { max-width: 640px; margin: 0 auto; }
+.hd { text-align: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #e0e0e0; }
+.hd h1 { font-size: 22px; font-weight: 600; color: #111; margin-bottom: 4px; }
+.hd p { font-size: 13px; color: #666; }
+.card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
+.upload { border: 2px dashed #ccc; border-radius: 12px; padding: 2rem; text-align: center; cursor: pointer; background: #fafafa; margin-bottom: 1rem; }
+.upload:hover { background: #f0f0f0; }
+.upload p { font-size: 14px; color: #666; margin-bottom: 4px; }
+.upload small { font-size: 12px; color: #999; }
+#previewImg { max-width: 100%; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #e0e0e0; display: none; }
+.analyze-btn { width: 100%; padding: 12px; background: #185FA5; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 1rem; display: none; }
+.analyze-btn:hover { background: #0C447C; }
+.loading { text-align: center; padding: 1.5rem; display: none; }
+.spinner { width: 24px; height: 24px; border: 3px solid #e0e0e0; border-top-color: #185FA5; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading p { font-size: 13px; color: #666; }
+.concept-card { display: none; margin-bottom: 1rem; }
+.section-label { font-size: 12px; font-weight: 600; color: #666; margin-bottom: 8px; letter-spacing: 0.5px; text-transform: uppercase; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { background: #E6F1FB; color: #0C447C; font-size: 12px; padding: 5px 12px; border-radius: 20px; font-weight: 500; }
+.sol-card { display: none; margin-bottom: 1rem; }
+.sol-card h3 { font-size: 15px; font-weight: 600; color: #111; margin-bottom: 12px; }
+.step { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+.snum { min-width: 24px; height: 24px; border-radius: 50%; background: #185FA5; color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.stxt { font-size: 14px; color: #222; line-height: 1.7; }
+.answer-box { margin-top: 12px; padding: 12px; background: #E6F1FB; border-radius: 8px; font-size: 15px; font-weight: 600; color: #0C447C; }
+.chat-wrap { display: none; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; }
+.chat-header { padding: 10px 14px; background: #185FA5; color: #fff; font-size: 13px; font-weight: 500; }
+.chat-msgs { padding: 1rem; min-height: 120px; max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f9f9f9; }
+.msg { padding: 10px 14px; border-radius: 10px; font-size: 13px; line-height: 1.6; max-width: 88%; white-space: pre-wrap; }
+.msg.bot { background: #fff; color: #222; align-self: flex-start; border: 1px solid #e0e0e0; }
+.msg.user { background: #185FA5; color: #fff; align-self: flex-end; }
+.chat-input { display: flex; border-top: 1px solid #e0e0e0; }
+.chat-input input { flex: 1; padding: 12px 14px; font-size: 13px; border: none; outline: none; background: #fff; }
+.chat-input button { padding: 12px 18px; background: #185FA5; color: #fff; border: none; font-size: 13px; font-weight: 500; cursor: pointer; }
+.chat-input button:hover { background: #0C447C; }
 </style>
 </head>
 <body>
@@ -59,16 +50,6 @@
   <div class="hd">
     <h1>수학 멘토 선생님</h1>
     <p>31년 경력 선생님의 개념 중심 AI 풀이 서비스</p>
-  </div>
-
-  <div class="card">
-    <label>Anthropic API 키</label>
-    <div class="row">
-      <input type="password" id="apiKey" placeholder="sk-ant-api03-..." />
-      <button class="btn" onclick="saveKey()">저장</button>
-    </div>
-    <p class="status" id="keyStatus">API 키를 입력하고 저장해 주세요</p>
-    <p class="err-msg" id="keyErr">올바른 API 키 형식이 아닙니다 (sk-ant-로 시작해야 합니다)</p>
   </div>
 
   <div class="upload" onclick="document.getElementById('fileIn').click()">
@@ -108,28 +89,10 @@
 </div>
 
 <script>
-let KEY = '';
 let imgData = null;
 let imgType = null;
 let history = [];
 let context = '';
-
-function saveKey() {
-  const v = document.getElementById('apiKey').value.trim();
-  const err = document.getElementById('keyErr');
-  const st = document.getElementById('keyStatus');
-  if (!v.startsWith('sk-ant-')) {
-    err.style.display = 'block';
-    st.style.color = '#666';
-    st.textContent = 'API 키를 확인해 주세요';
-    return;
-  }
-  err.style.display = 'none';
-  KEY = v;
-  document.getElementById('apiKey').value = '••••••••••••••••••••••••';
-  st.style.color = '#0F6E56';
-  st.textContent = '저장되었습니다! 이제 문제 사진을 올려주세요.';
-}
 
 function loadImg(e) {
   const f = e.target.files[0];
@@ -149,58 +112,24 @@ function loadImg(e) {
   r.readAsDataURL(f);
 }
 
-async function callAPI(messages, system, isJson) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': KEY,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1500, system, messages })
-  });
-  if (!res.ok) {
-    const e = await res.json();
-    throw new Error(e.error?.message || '오류가 발생했습니다');
-  }
-  const data = await res.json();
-  const text = data.content.map(i => i.text || '').join('');
-  if (isJson) {
-    const clean = text.replace(/```json|```/g, '').trim();
-    return JSON.parse(clean);
-  }
-  return text;
-}
-
 async function analyze() {
-  if (!KEY) { alert('먼저 API 키를 저장해 주세요.'); return; }
   if (!imgData) { alert('문제 사진을 먼저 올려주세요.'); return; }
-
   document.getElementById('analyzeBtn').style.display = 'none';
   document.getElementById('loading').style.display = 'block';
   document.getElementById('loadingMsg').textContent = '개념 분석 중...';
 
   try {
-    const sys = `당신은 31년 경력의 수학 선생님입니다. 중간 실력 학생도 이해할 수 있도록 개념 중심으로 설명합니다.
-반드시 아래 JSON 형식으로만 응답하세요. 마크다운 없이 순수 JSON만 출력하세요:
-{"concepts":["개념1","개념2","개념3"],"steps":[{"num":1,"text":"설명"},{"num":2,"text":"설명"}],"answer":"최종 답"}
-각 step은 왜 이 방법을 쓰는지 개념과 연결해서 친절하게 설명해 주세요.`;
-
-    const msgs = [{
-      role: 'user',
-      content: [
-        { type: 'image', source: { type: 'base64', media_type: imgType, data: imgData } },
-        { type: 'text', text: '이 수학 문제를 분석해주세요. 중간 실력 학생 기준으로 필요한 개념을 먼저 제시하고 단계별로 풀이해주세요.' }
-      ]
-    }];
-
-    document.getElementById('loadingMsg').textContent = '풀이 생성 중...';
-    const parsed = await callAPI(msgs, sys, true);
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageData: imgData, mediaType: imgType })
+    });
+    if (!res.ok) throw new Error('서버 오류가 발생했습니다');
+    const parsed = await res.json();
     context = JSON.stringify(parsed);
     history = [];
 
     document.getElementById('loading').style.display = 'none';
-
     document.getElementById('tags').innerHTML = parsed.concepts.map(c => `<span class="tag">${c}</span>`).join('');
     document.getElementById('conceptBox').style.display = 'block';
 
@@ -213,7 +142,6 @@ async function analyze() {
     document.getElementById('solContent').innerHTML = html;
     document.getElementById('solBox').style.display = 'block';
     document.getElementById('chatWrap').style.display = 'block';
-
   } catch (err) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('analyzeBtn').style.display = 'block';
@@ -222,7 +150,6 @@ async function analyze() {
 }
 
 async function sendMsg() {
-  if (!KEY) { alert('API 키를 먼저 저장해 주세요.'); return; }
   const inp = document.getElementById('chatIn');
   const msg = inp.value.trim();
   if (!msg) return;
@@ -241,11 +168,16 @@ async function sendMsg() {
   box.scrollTop = box.scrollHeight;
 
   try {
-    const sys = `당신은 31년 경력의 수학 선생님입니다. 개념 중심으로 친절하고 따뜻하게 설명합니다. 중간 실력 학생도 이해할 수 있도록 쉽게 설명해주세요. 앞서 풀이한 문제 정보: ${context}`;
-    const reply = await callAPI(history, sys, false);
-    history.push({ role: 'assistant', content: reply });
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: history, context })
+    });
+    if (!res.ok) throw new Error('서버 오류');
+    const data = await res.json();
+    history.push({ role: 'assistant', content: data.reply });
     document.getElementById('typing')?.remove();
-    box.innerHTML += `<div class="msg bot">${reply}</div>`;
+    box.innerHTML += `<div class="msg bot">${data.reply}</div>`;
     box.scrollTop = box.scrollHeight;
   } catch (err) {
     document.getElementById('typing')?.remove();
