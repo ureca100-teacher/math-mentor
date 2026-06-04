@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>수학 멘토 선생님</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 <script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fae6"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -126,15 +126,13 @@ function loadImg(e) {
 }
 
 function renderMath(el) {
-  if (window.renderMathInElement) {
-    renderMathInElement(el, {
-      delimiters: [
-        {left: '$$', right: '$$', display: true},
-        {left: '$', right: '$', display: false}
-      ],
-      throwOnError: false
-    });
-  }
+  renderMathInElement(el, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false}
+    ],
+    throwOnError: false
+  });
 }
 
 function drawGraph(expressions) {
@@ -161,21 +159,26 @@ async function analyze() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ imageData: imgData, mediaType: imgType })
     });
-    if (!res.ok) throw new Error('서버 오류가 발생했습니다');
-    const parsed = await res.json();
-    context = JSON.stringify(parsed);
+
+    const data = await res.json();
+
+    if (data.error) {
+      throw new Error(data.error);
+    }
+
+    context = JSON.stringify(data);
     history = [];
 
     document.getElementById('loading').style.display = 'none';
-    document.getElementById('tags').innerHTML = parsed.concepts.map(c => `<span class="tag">${c}</span>`).join('');
+    document.getElementById('tags').innerHTML = data.concepts.map(c => `<span class="tag">${c}</span>`).join('');
     document.getElementById('conceptBox').style.display = 'block';
 
-    let html = parsed.steps.map(s => `
+    let html = data.steps.map(s => `
       <div class="step">
         <div class="snum">${s.num}</div>
         <div class="stxt">${s.text}</div>
       </div>`).join('');
-    html += `<div class="answer-box">정답: ${parsed.answer}</div>`;
+    html += `<div class="answer-box">정답: ${data.answer}</div>`;
 
     const solContent = document.getElementById('solContent');
     solContent.innerHTML = html;
@@ -184,8 +187,8 @@ async function analyze() {
     document.getElementById('solBox').style.display = 'block';
     document.getElementById('chatWrap').style.display = 'block';
 
-    if (parsed.graphs && parsed.graphs.length > 0) {
-      drawGraph(parsed.graphs);
+    if (data.graphs && data.graphs.length > 0) {
+      drawGraph(data.graphs);
     }
 
   } catch (err) {
@@ -219,8 +222,8 @@ async function sendMsg() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages: history, context })
     });
-    if (!res.ok) throw new Error('서버 오류');
     const data = await res.json();
+    if (data.error) throw new Error(data.error);
     history.push({ role: 'assistant', content: data.reply });
     document.getElementById('typing')?.remove();
     const msgEl = document.createElement('div');
