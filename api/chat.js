@@ -13,7 +13,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
+        max_tokens: 3000,
         system: `당신은 31년 경력의 수학 선생님입니다. 개념 중심으로 친절하게 설명합니다.
 수식은 반드시 KaTeX 형식으로: 인라인은 $수식$, 블록은 $$수식$$
 그리스 문자: \\alpha, \\beta, \\gamma 등 LaTeX 명령어 사용
